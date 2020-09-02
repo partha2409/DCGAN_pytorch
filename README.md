@@ -2,7 +2,7 @@
 This repository is a simple Pytorch Implementation of DCGAN https://arxiv.org/abs/1511.06434  for generation of human faces using CelebA dataset.
 
 Requriements:
-Pytorch 1.3,
+Pytorch,
 PIL,
 Matplotlib,
 Pickle
