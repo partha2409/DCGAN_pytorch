@@ -75,21 +75,7 @@ def train(pre_trained=None):
             gen_out = generator(noise_input)
             disc_real_out = discriminator(img.float())
             disc_fake_out = discriminator(gen_out)
-
             # loss and back prop
-
-            # discriminator real loss
-            target = torch.ones(hp['batch_size'], 1).to(device)
-            d_loss_real = loss(disc_real_out, target)
-
-            # discriminator fake loss
-            target = torch.zeros(hp['batch_size'], 1).to(device)
-            d_loss_fake = loss(disc_fake_out, target)
-
-            disc_loss = d_loss_fake + d_loss_real
-
-            disc_loss.backward(retain_graph=True)
-            d_optimizer.step()
 
             # generator_loss
             target = torch.ones(hp['batch_size'], 1).to(device)
@@ -97,8 +83,22 @@ def train(pre_trained=None):
 
             gen_loss.backward()
             g_optimizer.step()
-
             g_loss += gen_loss.item()
+
+            # discriminator real loss
+            target = torch.ones(hp['batch_size'], 1).to(device)
+            d_loss_real = loss(disc_real_out, target)
+
+            # discriminator fake loss
+            target = torch.zeros(hp['batch_size'], 1).to(device)
+            disc_fake_out = discriminator(gen_out.detach())
+            d_loss_fake = loss(disc_fake_out, target)
+
+            disc_loss = d_loss_fake + d_loss_real
+
+            disc_loss.backward(retain_graph=True)
+            d_optimizer.step()
+
             d_loss += disc_loss.item()
             print("epoch = {}, Training_sample={}, generator_loss ={}".format(epoch, i, gen_loss))
             print("epoch = {}, Training_sample={}, discriminator_loss ={}".format(epoch, i, disc_loss))
